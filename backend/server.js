@@ -54,6 +54,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// API root endpoint (REST compliant)
+app.get('/', (req, res) => {
+  res.json({
+    name: 'QuizAI API',
+    version: '1.0.0',
+    status: 'operational',
+    documentation: '/api'
+  });
+});
+
 // Routes
 app.use('/', routes);
 
