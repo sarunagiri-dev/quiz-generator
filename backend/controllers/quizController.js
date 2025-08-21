@@ -71,17 +71,10 @@ Requirements:
 
   } catch (error) {
     console.error('Error generating quiz:', error.message);
+    console.error('Using mock quiz as fallback');
     
-    // Fallback to mock quiz
-    try {
-      const mockQuiz = generateMockQuiz(req.body.topic || 'general');
-      res.json(mockQuiz);
-    } catch (fallbackError) {
-      console.error('Fallback quiz generation failed:', fallbackError.message);
-      res.status(500).json({ 
-        error: 'Failed to generate quiz. Please try again.' 
-      });
-    }
+    const mockQuiz = generateMockQuiz(req.body.topic || 'general');
+    return res.json(mockQuiz);
   }
 };
 
