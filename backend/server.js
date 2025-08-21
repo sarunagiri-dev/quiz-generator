@@ -1,6 +1,9 @@
 /**
  * Quiz Generator Backend Server
  * Main application entry point with modular architecture
+ * 
+ * @license MIT
+ * @copyright 2024 Quiz Generator
  */
 
 const express = require('express');
