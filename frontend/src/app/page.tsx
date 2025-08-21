@@ -1,103 +1,194 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from 'react';
+
+// Define the type for a single quiz question
+type Question = {
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+};
+
+// Define the type for the user's answers
+type UserAnswers = {
+  [key: number]: number;
+};
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [topic, setTopic] = useState('');
+  const [quiz, setQuiz] = useState<Question[] | null>(null);
+  const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
+  const [score, setScore] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [quizFinished, setQuizFinished] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleGenerateQuiz = async () => {
+    if (!topic.trim()) {
+      setError('Please enter a topic.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setQuiz(null);
+    setQuizFinished(false);
+    setUserAnswers({});
+    setScore(null);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate quiz');
+      }
+
+      const data: Question[] = await response.json();
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("The AI returned invalid quiz data. Please try again.");
+      }
+      setQuiz(data);
+    } catch (err: any) {
+      setError(err.message || 'An unknown error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAnswerSelect = (questionIndex: number, optionIndex: number) => {
+    setUserAnswers({
+      ...userAnswers,
+      [questionIndex]: optionIndex,
+    });
+  };
+
+  const handleSubmitQuiz = () => {
+    if (!quiz) return;
+    let correctAnswers = 0;
+    quiz.forEach((question, index) => {
+      if (userAnswers[index] === question.correctOptionIndex) {
+        correctAnswers++;
+      }
+    });
+    setScore(correctAnswers);
+    setQuizFinished(true);
+  };
+
+  const handleRestart = () => {
+    setTopic('');
+    setQuiz(null);
+    setUserAnswers({});
+    setScore(null);
+    setError(null);
+    setQuizFinished(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center p-4">
+      <main className="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h1 className="text-3xl font-bold text-center mb-6 text-blue-600 dark:text-blue-400">AI Quiz Generator</h1>
+
+        {!quiz && !quizFinished && (
+          <div className="flex flex-col items-center">
+            <input
+              type="text"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="Enter a topic (e.g., Photosynthesis)"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
+              disabled={loading}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+            <button
+              onClick={handleGenerateQuiz}
+              disabled={loading}
+              className="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 dark:disabled:bg-blue-800 transition-colors"
+            >
+              {loading ? 'Generating...' : 'Generate Quiz'}
+            </button>
+            {error && <p className="text-red-500 mt-4">{error}</p>}
+          </div>
+        )}
+
+        {loading && (
+            <div className="text-center">
+                <p>Generating your quiz, please wait...</p>
+            </div>
+        )}
+
+        {quiz && !quizFinished && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-center">Quiz on: {topic}</h2>
+            {quiz.map((q, qIndex) => (
+              <div key={qIndex} className="mb-6">
+                <p className="font-semibold mb-2">{qIndex + 1}. {q.question}</p>
+                <div className="space-y-2">
+                  {q.options.map((option, oIndex) => (
+                    <label key={oIndex} className="flex items-center p-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700">
+                      <input
+                        type="radio"
+                        name={`question-${qIndex}`}
+                        checked={userAnswers[qIndex] === oIndex}
+                        onChange={() => handleAnswerSelect(qIndex, oIndex)}
+                        className="mr-3"
+                      />
+                      {option}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button
+              onClick={handleSubmitQuiz}
+              className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              Submit Quiz
+            </button>
+          </div>
+        )}
+
+        {quizFinished && quiz && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4 text-center">Quiz Results</h2>
+            <p className="text-xl text-center mb-6">You scored <span className="font-bold">{score}</span> out of <span className="font-bold">{quiz.length}</span></p>
+
+            {quiz.map((q, qIndex) => {
+              const userAnswer = userAnswers[qIndex];
+              const isCorrect = userAnswer === q.correctOptionIndex;
+              return (
+                <div key={qIndex} className="mb-4 p-3 rounded-lg" style={{ border: `2px solid ${isCorrect ? 'green' : 'red'}` }}>
+                  <p className="font-semibold">{qIndex + 1}. {q.question}</p>
+                  <div className="mt-2">
+                    {q.options.map((option, oIndex) => {
+                      let style = {};
+                      if (oIndex === q.correctOptionIndex) {
+                        style = { color: 'green', fontWeight: 'bold' };
+                      } else if (oIndex === userAnswer) {
+                        style = { color: 'red', fontWeight: 'bold' };
+                      }
+                      return <p key={oIndex} style={style}>{option}</p>;
+                    })}
+                  </div>
+                  {!isCorrect && <p className="text-sm mt-1">Your answer: <span style={{color: 'red'}}>{q.options[userAnswer]}</span></p>}
+                  <p className="text-sm mt-1">Correct answer: <span style={{color: 'green'}}>{q.options[q.correctOptionIndex]}</span></p>
+                </div>
+              );
+            })}
+
+            <button
+              onClick={handleRestart}
+              className="w-full mt-6 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Take Another Quiz
+            </button>
+          </div>
+        )}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
   );
 }
