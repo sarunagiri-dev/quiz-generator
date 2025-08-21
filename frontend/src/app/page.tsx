@@ -2,33 +2,50 @@
 
 import { useState } from 'react';
 
-// Define the type for a single quiz question
+// === Type Definitions ===
+// Defines the structure of a single quiz question object.
 type Question = {
   question: string;
   options: string[];
   correctOptionIndex: number;
 };
 
-// Define the type for the user's answers
+// Defines the structure for storing the user's answers.
+// The key is the question index (number), and the value is the selected option index (number).
 type UserAnswers = {
   [key: number]: number;
 };
 
 export default function Home() {
+  // === State Management ===
+  // The topic for the quiz entered by the user.
   const [topic, setTopic] = useState('');
+  // The array of quiz questions received from the backend.
   const [quiz, setQuiz] = useState<Question[] | null>(null);
+  // An object to store the user's selected answers.
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
+  // The user's final score.
   const [score, setScore] = useState<number | null>(null);
+  // A boolean to indicate if the initial quiz is being generated.
   const [loading, setLoading] = useState(false);
+  // A boolean to indicate if more questions are being loaded.
   const [loadingMore, setLoadingMore] = useState(false);
+  // A string to store any error messages.
   const [error, setError] = useState<string | null>(null);
+  // A boolean to indicate if the quiz has been submitted and the results are being shown.
   const [quizFinished, setQuizFinished] = useState(false);
 
+  /**
+   * Handles the initial generation of the quiz.
+   * This function is called when the "Generate Quiz" button is clicked.
+   */
   const handleGenerateQuiz = async () => {
+    // Basic validation to ensure a topic is entered.
     if (!topic.trim()) {
       setError('Please enter a topic.');
       return;
     }
+    // Set loading state and reset previous quiz data.
     setLoading(true);
     setError(null);
     setQuiz(null);
@@ -37,6 +54,7 @@ export default function Home() {
     setScore(null);
 
     try {
+      // Fetch the quiz from the backend API.
       const response = await fetch('http://localhost:5000/api/quiz', {
         method: 'POST',
         headers: {
@@ -45,12 +63,14 @@ export default function Home() {
         body: JSON.stringify({ topic }),
       });
 
+      // Handle non-successful HTTP responses.
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to generate quiz');
       }
 
       const data: Question[] = await response.json();
+      // Validate the data received from the backend.
       if (!Array.isArray(data) || data.length === 0) {
         throw new Error("The AI returned invalid quiz data. Please try again.");
       }
@@ -62,6 +82,9 @@ export default function Home() {
     }
   };
 
+  /**
+   * Fetches 5 more questions from the backend and appends them to the current quiz.
+   */
   const handleLoadMore = async () => {
     setLoadingMore(true);
     setError(null);
@@ -71,7 +94,7 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ topic }),
+        body: JSON.stringify({ topic }), // Use the same topic
       });
 
       if (!response.ok) {
@@ -83,6 +106,7 @@ export default function Home() {
       if (!Array.isArray(newQuestions) || newQuestions.length === 0) {
         throw new Error("The AI returned invalid quiz data. Please try again.");
       }
+      // Append new questions to the existing quiz array.
       setQuiz(prevQuiz => prevQuiz ? [...prevQuiz, ...newQuestions] : newQuestions);
     } catch (err: any) {
       setError(err.message || 'An unknown error occurred while loading more questions.');
@@ -91,6 +115,11 @@ export default function Home() {
     }
   };
 
+  /**
+   * Records the user's selected answer for a specific question.
+   * @param questionIndex The index of the question being answered.
+   * @param optionIndex The index of the option selected by the user.
+   */
   const handleAnswerSelect = (questionIndex: number, optionIndex: number) => {
     setUserAnswers({
       ...userAnswers,
@@ -98,18 +127,25 @@ export default function Home() {
     });
   };
 
+  /**
+   * Calculates the user's score and transitions the UI to the results view.
+   */
   const handleSubmitQuiz = () => {
     if (!quiz) return;
     let correctAnswers = 0;
+    // Loop through the quiz questions and compare user's answers with correct answers.
     quiz.forEach((question, index) => {
       if (userAnswers[index] === question.correctOptionIndex) {
         correctAnswers++;
       }
     });
     setScore(correctAnswers);
-    setQuizFinished(true);
+    setQuizFinished(true); // Set quiz as finished to show the results screen.
   };
 
+  /**
+   * Resets the entire application state to allow the user to start a new quiz.
+   */
   const handleRestart = () => {
     setTopic('');
     setQuiz(null);
@@ -119,11 +155,13 @@ export default function Home() {
     setQuizFinished(false);
   };
 
+  // === JSX Rendering ===
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 flex flex-col items-center justify-center p-4">
       <main className="w-full max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h1 className="text-3xl font-bold text-center mb-6 text-blue-600 dark:text-blue-400">AI Quiz Generator</h1>
 
+        {/* View 1: Topic Input Form (Initial State) */}
         {!quiz && !quizFinished && (
           <div className="flex flex-col items-center">
             <input
@@ -145,12 +183,14 @@ export default function Home() {
           </div>
         )}
 
+        {/* Loading indicator for initial quiz generation */}
         {loading && (
             <div className="text-center">
                 <p>Generating your quiz, please wait...</p>
             </div>
         )}
 
+        {/* View 2: Active Quiz */}
         {quiz && !quizFinished && (
           <div>
             <h2 className="text-2xl font-semibold mb-4 text-center">Quiz on: {topic}</h2>
@@ -188,10 +228,12 @@ export default function Home() {
                 {loadingMore ? 'Loading...' : 'Load More Questions'}
               </button>
             </div>
+            {/* Show error messages related to loading more questions */}
             {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
           </div>
         )}
 
+        {/* View 3: Quiz Results */}
         {quizFinished && quiz && (
           <div>
             <h2 className="text-2xl font-semibold mb-4 text-center">Quiz Results</h2>
@@ -207,13 +249,16 @@ export default function Home() {
                     {q.options.map((option, oIndex) => {
                       let style = {};
                       if (oIndex === q.correctOptionIndex) {
+                        // Style for the correct answer
                         style = { color: 'green', fontWeight: 'bold' };
                       } else if (oIndex === userAnswer) {
+                        // Style for the user's incorrect answer
                         style = { color: 'red', fontWeight: 'bold' };
                       }
                       return <p key={oIndex} style={style}>{option}</p>;
                     })}
                   </div>
+                  {/* Show the user's incorrect answer explicitly if they got it wrong */}
                   {!isCorrect && userAnswer !== undefined && <p className="text-sm mt-1">Your answer: <span style={{color: 'red'}}>{q.options[userAnswer]}</span></p>}
                   <p className="text-sm mt-1">Correct answer: <span style={{color: 'green'}}>{q.options[q.correctOptionIndex]}</span></p>
                 </div>
