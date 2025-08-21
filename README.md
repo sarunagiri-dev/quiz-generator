@@ -171,52 +171,30 @@ npm run dev
 
 ## 📚 API Documentation
 
-### Quiz Generation
-```http
-POST /api/quiz
-Content-Type: application/json
+### Interactive API Docs
+Swagger documentation available at: `backend/swagger.json`
 
-{
-  "topic": "photosynthesis"
-}
-```
+### Quick Reference
 
-**Response:**
-```json
-[
-  {
-    "question": "What is the primary purpose of photosynthesis?",
-    "options": ["Energy storage", "Oxygen production", "Water absorption", "Root growth"],
-    "correctOptionIndex": 0,
-    "explanation": "Photosynthesis converts light energy into chemical energy (glucose) for storage."
-  }
-]
-```
+| Endpoint | Method | Description |
+|----------|--------|--------------|
+| `/api` | GET | Health check |
+| `/api/quiz` | POST | Generate quiz (max 50 char topic) |
+| `/api/results` | GET | Get quiz history (paginated) |
+| `/api/results` | POST | Save quiz result |
+| `/api/results/stats` | GET | Get statistics |
 
-### Results Management
-```http
-# Get quiz history with pagination
-GET /api/results?limit=20&offset=0&topic=math&sortBy=timestamp&sortOrder=desc
+### Example Usage
+```bash
+# Generate quiz
+curl -X POST http://localhost:3001/api/quiz \
+  -H "Content-Type: application/json" \
+  -d '{"topic":"math"}'
 
-# Save quiz result
-POST /api/results
-{
-  "topic": "math",
-  "score": 4,
-  "totalQuestions": 5
-}
-
-# Get statistics
-GET /api/results/stats
-```
-
-**Statistics Response:**
-```json
-{
-  "totalQuizzes": 150,
-  "averageScore": 78.5,
-  "uniqueTopics": 25
-}
+# Save result
+curl -X POST http://localhost:3001/api/results \
+  -H "Content-Type: application/json" \
+  -d '{"topic":"math","score":4,"totalQuestions":5}'
 ```
 
 ## 🏗️ Project Structure
@@ -225,21 +203,22 @@ GET /api/results/stats
 quiz-generator/
 ├── backend/
 │   ├── config/
-│   │   └── database.js          # MongoDB connection configuration
+│   │   └── database.js          # MongoDB connection with pooling
 │   ├── controllers/
-│   │   ├── quizController.js    # Quiz generation logic
-│   │   └── resultsController.js # Results management logic
+│   │   ├── quizController.js    # Quiz generation with AI integration
+│   │   └── resultsController.js # Results CRUD with pagination
 │   ├── models/
-│   │   └── QuizResult.js        # MongoDB schema definitions
+│   │   └── QuizResult.js        # MongoDB schema with validation
 │   ├── routes/
-│   │   └── index.js             # API route definitions
+│   │   └── index.js             # Centralized API routes
 │   ├── services/
-│   │   ├── wikipediaService.js  # Wikipedia API integration
-│   │   └── quizService.js       # Quiz generation utilities
+│   │   ├── wikipediaService.js  # Wikipedia API with caching
+│   │   └── quizService.js       # Mock quiz generation
 │   ├── tests/
-│   │   └── server.test.js       # Comprehensive test suite
-│   ├── .env.example             # Environment template
-│   ├── server.js                # Application entry point
+│   │   └── server.test.js       # Complete test coverage
+│   ├── .env.example             # Environment variables template
+│   ├── server.js                # Express app with security
+│   ├── swagger.json             # API documentation
 │   └── package.json             # Dependencies and scripts
 ├── frontend/
 │   ├── src/app/
@@ -268,6 +247,20 @@ npm test
 - Wikipedia integration
 - Results persistence and retrieval
 
+## 🔒 Security
+
+### Built-in Protection
+- **Rate Limiting**: 10 requests per 10 minutes per IP
+- **Input Validation**: Topic length limited to 50 characters
+- **CORS Protection**: Configurable allowed origins
+- **Environment Variables**: Sensitive data in `.env` files
+
+### Security Best Practices
+- Never commit API keys to version control
+- Use HTTPS in production
+- Keep dependencies updated
+- Monitor API usage and costs
+
 ## 🔧 Configuration
 
 ### Backend Configuration
@@ -275,6 +268,7 @@ npm test
 - **Database**: MongoDB connection with pooling
 - **CORS**: Configurable frontend URL
 - **Caching**: Wikipedia responses cached for 1 hour
+- **Rate Limiting**: 10 requests per 10-minute window
 
 ### Frontend Configuration
 - **API URL**: `NEXT_PUBLIC_API_URL` environment variable
@@ -332,9 +326,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [ ] User authentication and profiles
 - [x] Database integration (MongoDB)
-- [x] Modular architecture implementation
+- [x] Modular architecture implementation  
 - [x] Comprehensive error handling
-- [x] API documentation and testing
+- [x] API documentation (Swagger) and testing
+- [x] Security (rate limiting, input validation)
+- [x] Caching (Wikipedia responses)
 - [ ] Real-time multiplayer quizzes
 - [ ] Advanced analytics dashboard
 - [ ] Mobile app (React Native)

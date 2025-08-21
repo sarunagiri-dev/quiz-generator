@@ -7,6 +7,25 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+// Simple in-memory rate limiting (10 requests per 10 minutes per IP)
+const requests = new Map();
+const rateLimit = (req, res, next) => {
+  const ip = req.ip;
+  const now = Date.now();
+  const window = 10 * 60 * 1000;
+  
+  if (!requests.has(ip)) requests.set(ip, []);
+  const userRequests = requests.get(ip).filter(time => now - time < window);
+  
+  if (userRequests.length >= 10) {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
+  
+  userRequests.push(now);
+  requests.set(ip, userRequests);
+  next();
+};
+
 const { connectDB } = require('./config/database');
 const routes = require('./routes');
 
@@ -22,8 +41,9 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1mb' })); // Reduced limit
 app.use(express.urlencoded({ extended: true }));
+app.use(rateLimit); // Basic rate limiting
 
 // Request logging middleware
 app.use((req, res, next) => {
