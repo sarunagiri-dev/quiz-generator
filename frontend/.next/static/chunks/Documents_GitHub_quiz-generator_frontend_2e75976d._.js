@@ -37,8 +37,14 @@ function Home() {
     // Boolean to show/hide results history
     const [showResults, setShowResults] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     /**
-   * Handles the initial generation of the quiz.
-   * This function is called when the "Generate Quiz" button is clicked.
+   * Generates a new quiz for the specified topic
+   * 
+   * Validates input, calls the backend API, and handles both success and error cases.
+   * Falls back to mock data if the API fails.
+   * 
+   * @async
+   * @function handleGenerateQuiz
+   * @returns {Promise<void>}
    */ const handleGenerateQuiz = async ()=>{
         // Basic validation to ensure a topic is entered.
         if (!topic.trim()) {
@@ -81,7 +87,14 @@ function Home() {
         }
     };
     /**
-   * Fetches 5 more questions from the backend and appends them to the current quiz.
+   * Loads additional questions for the current topic
+   * 
+   * Fetches 5 more questions from the backend API and appends them to the existing quiz.
+   * Maintains the same topic and handles errors gracefully.
+   * 
+   * @async
+   * @function handleLoadMore
+   * @returns {Promise<void>}
    */ const handleLoadMore = async ()=>{
         setLoadingMore(true);
         setError(null);
@@ -115,9 +128,15 @@ function Home() {
         }
     };
     /**
-   * Records the user's selected answer for a specific question.
-   * @param questionIndex The index of the question being answered.
-   * @param optionIndex The index of the option selected by the user.
+   * Records the user's answer selection for a question
+   * 
+   * Updates the userAnswers state with the selected option for the given question.
+   * Allows users to change their answers before submitting.
+   * 
+   * @function handleAnswerSelect
+   * @param {number} questionIndex - Zero-based index of the question (0-4)
+   * @param {number} optionIndex - Zero-based index of the selected option (0-3)
+   * @returns {void}
    */ const handleAnswerSelect = (questionIndex, optionIndex)=>{
         setUserAnswers({
             ...userAnswers,
@@ -126,18 +145,27 @@ function Home() {
     };
     /**
    * Calculates the user's score and transitions the UI to the results view.
+   */ /**
+   * Calculates the final score and saves the quiz result
+   * 
+   * Compares user answers with correct answers, calculates the score,
+   * transitions to results view, and saves the result to the backend.
+   * 
+   * @async
+   * @function handleSubmitQuiz
+   * @returns {Promise<void>}
    */ const handleSubmitQuiz = async ()=>{
         if (!quiz) return;
         let correctAnswers = 0;
-        // Loop through the quiz questions and compare user's answers with correct answers.
+        // Calculate score by comparing user answers with correct answers
         quiz.forEach((question, index)=>{
             if (userAnswers[index] === question.correctOptionIndex) {
                 correctAnswers++;
             }
         });
         setScore(correctAnswers);
-        setQuizFinished(true); // Set quiz as finished to show the results screen.
-        // Save quiz result
+        setQuizFinished(true);
+        // Persist quiz result to backend
         try {
             await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', "/api/results"), {
                 method: 'POST',
@@ -156,19 +184,36 @@ function Home() {
     };
     /**
    * Resets the entire application state to allow the user to start a new quiz.
+   */ /**
+   * Loads and displays the quiz results history
+   * 
+   * Fetches the user's quiz history from the backend and displays it in a modal.
+   * Shows the last 10 quiz attempts with scores and dates.
+   * 
+   * @async
+   * @function loadQuizResults
+   * @returns {Promise<void>}
    */ const loadQuizResults = async ()=>{
         try {
             const response = await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', "/api/results"));
             if (response.ok) {
-                const results = await response.json();
-                setQuizResults(results);
+                const data = await response.json();
+                setQuizResults(data.results || data); // Handle both paginated and simple responses
                 setShowResults(true);
             }
         } catch (error) {
             console.error('Failed to load quiz results:', error);
         }
     };
-    const handleRestart = ()=>{
+    /**
+   * Resets the application to its initial state
+   * 
+   * Clears all quiz data, user answers, and UI state to allow starting a new quiz.
+   * Returns the user to the topic input screen.
+   * 
+   * @function handleRestart
+   * @returns {void}
+   */ const handleRestart = ()=>{
         setTopic('');
         setQuiz(null);
         setUserAnswers({});
@@ -188,7 +233,7 @@ function Home() {
                     children: "AI Quiz Generator"
                 }, void 0, false, {
                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                    lineNumber: 199,
+                    lineNumber: 275,
                     columnNumber: 9
                 }, this),
                 !quiz && !quizFinished && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -203,7 +248,7 @@ function Home() {
                             disabled: loading
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 204,
+                            lineNumber: 280,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -213,7 +258,7 @@ function Home() {
                             children: loading ? 'Generating...' : 'Generate Quiz'
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 212,
+                            lineNumber: 288,
                             columnNumber: 13
                         }, this),
                         error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -221,13 +266,13 @@ function Home() {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 219,
+                            lineNumber: 295,
                             columnNumber: 23
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                    lineNumber: 203,
+                    lineNumber: 279,
                     columnNumber: 11
                 }, this),
                 loading && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -236,12 +281,12 @@ function Home() {
                         children: "Generating your quiz, please wait..."
                     }, void 0, false, {
                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                        lineNumber: 226,
+                        lineNumber: 302,
                         columnNumber: 17
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                    lineNumber: 225,
+                    lineNumber: 301,
                     columnNumber: 13
                 }, this),
                 quiz && !quizFinished && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -254,7 +299,7 @@ function Home() {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 233,
+                            lineNumber: 309,
                             columnNumber: 13
                         }, this),
                         quiz.map((q, qIndex)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -269,7 +314,7 @@ function Home() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 236,
+                                        lineNumber: 312,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -285,25 +330,25 @@ function Home() {
                                                         className: "mr-3"
                                                     }, void 0, false, {
                                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                        lineNumber: 240,
+                                                        lineNumber: 316,
                                                         columnNumber: 23
                                                     }, this),
                                                     option
                                                 ]
                                             }, oIndex, true, {
                                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                lineNumber: 239,
+                                                lineNumber: 315,
                                                 columnNumber: 21
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 237,
+                                        lineNumber: 313,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, qIndex, true, {
                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                lineNumber: 235,
+                                lineNumber: 311,
                                 columnNumber: 15
                             }, this)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -315,7 +360,7 @@ function Home() {
                                     children: "Submit Quiz"
                                 }, void 0, false, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 254,
+                                    lineNumber: 330,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -325,13 +370,13 @@ function Home() {
                                     children: loadingMore ? 'Loading...' : 'Load More Questions'
                                 }, void 0, false, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 260,
+                                    lineNumber: 336,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 253,
+                            lineNumber: 329,
                             columnNumber: 13
                         }, this),
                         error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -339,13 +384,13 @@ function Home() {
                             children: error
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 269,
+                            lineNumber: 345,
                             columnNumber: 23
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                    lineNumber: 232,
+                    lineNumber: 308,
                     columnNumber: 11
                 }, this),
                 quizFinished && quiz && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -355,7 +400,7 @@ function Home() {
                             children: "Quiz Results"
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 276,
+                            lineNumber: 352,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -367,7 +412,7 @@ function Home() {
                                     children: score
                                 }, void 0, false, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 277,
+                                    lineNumber: 353,
                                     columnNumber: 64
                                 }, this),
                                 " out of ",
@@ -376,13 +421,13 @@ function Home() {
                                     children: quiz.length
                                 }, void 0, false, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 277,
+                                    lineNumber: 353,
                                     columnNumber: 114
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 277,
+                            lineNumber: 353,
                             columnNumber: 13
                         }, this),
                         quiz.map((q, qIndex)=>{
@@ -403,7 +448,7 @@ function Home() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 284,
+                                        lineNumber: 360,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -428,13 +473,13 @@ function Home() {
                                                 children: option
                                             }, oIndex, false, {
                                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                lineNumber: 295,
+                                                lineNumber: 371,
                                                 columnNumber: 30
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 285,
+                                        lineNumber: 361,
                                         columnNumber: 19
                                     }, this),
                                     !isCorrect && userAnswer !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -448,13 +493,13 @@ function Home() {
                                                 children: q.options[userAnswer]
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                lineNumber: 299,
+                                                lineNumber: 375,
                                                 columnNumber: 103
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 375,
                                         columnNumber: 62
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -468,13 +513,13 @@ function Home() {
                                                 children: q.options[q.correctOptionIndex]
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 376,
                                                 columnNumber: 63
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 300,
+                                        lineNumber: 376,
                                         columnNumber: 19
                                     }, this),
                                     q.explanation && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -484,7 +529,7 @@ function Home() {
                                                 children: "Explanation:"
                                             }, void 0, false, {
                                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                lineNumber: 301,
+                                                lineNumber: 377,
                                                 columnNumber: 105
                                             }, this),
                                             " ",
@@ -492,13 +537,13 @@ function Home() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                        lineNumber: 301,
+                                        lineNumber: 377,
                                         columnNumber: 37
                                     }, this)
                                 ]
                             }, qIndex, true, {
                                 fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                lineNumber: 283,
+                                lineNumber: 359,
                                 columnNumber: 17
                             }, this);
                         }),
@@ -511,7 +556,7 @@ function Home() {
                                     children: "Take Another Quiz"
                                 }, void 0, false, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 307,
+                                    lineNumber: 383,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -520,19 +565,19 @@ function Home() {
                                     children: "View Results History"
                                 }, void 0, false, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 313,
+                                    lineNumber: 389,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 306,
+                            lineNumber: 382,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                    lineNumber: 275,
+                    lineNumber: 351,
                     columnNumber: 11
                 }, this),
                 showResults && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -543,7 +588,7 @@ function Home() {
                             children: "Quiz Results History"
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 325,
+                            lineNumber: 401,
                             columnNumber: 13
                         }, this),
                         quizResults.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -551,7 +596,7 @@ function Home() {
                             children: "No quiz results yet."
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 327,
+                            lineNumber: 403,
                             columnNumber: 15
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "space-y-2",
@@ -566,7 +611,7 @@ function Home() {
                                                     children: result.topic
                                                 }, void 0, false, {
                                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                    lineNumber: 333,
+                                                    lineNumber: 409,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -574,13 +619,13 @@ function Home() {
                                                     children: new Date(result.timestamp).toLocaleDateString()
                                                 }, void 0, false, {
                                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                                    lineNumber: 334,
+                                                    lineNumber: 410,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                            lineNumber: 332,
+                                            lineNumber: 408,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -596,18 +641,18 @@ function Home() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                            lineNumber: 338,
+                                            lineNumber: 414,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, index, true, {
                                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                                    lineNumber: 331,
+                                    lineNumber: 407,
                                     columnNumber: 19
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 329,
+                            lineNumber: 405,
                             columnNumber: 15
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -616,24 +661,24 @@ function Home() {
                             children: "Close History"
                         }, void 0, false, {
                             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                            lineNumber: 345,
+                            lineNumber: 421,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-                    lineNumber: 324,
+                    lineNumber: 400,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-            lineNumber: 198,
+            lineNumber: 274,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/Documents/GitHub/quiz-generator/frontend/src/app/page.tsx",
-        lineNumber: 197,
+        lineNumber: 273,
         columnNumber: 5
     }, this);
 }

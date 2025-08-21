@@ -2,28 +2,50 @@
 
 import { useState } from 'react';
 
-// === Type Definitions ===
-// Defines the structure of a single quiz question object.
+/**
+ * Type Definitions
+ */
+
+/** Represents a single quiz question with multiple choice options */
 type Question = {
+  /** The question text */
   question: string;
+  /** Array of 4 multiple choice options */
   options: string[];
+  /** Index (0-3) of the correct answer in the options array */
   correctOptionIndex: number;
+  /** Optional explanation of why the answer is correct */
   explanation?: string;
 };
 
+/** Represents a completed quiz result */
 type QuizResult = {
+  /** The topic/subject of the quiz */
   topic: string;
+  /** Number of correct answers */
   score: number;
+  /** Total number of questions in the quiz */
   totalQuestions: number;
+  /** ISO timestamp when the quiz was completed */
   timestamp: string;
 };
 
-// Defines the structure for storing the user's answers.
-// The key is the question index (number), and the value is the selected option index (number).
+/** Maps question indices to selected option indices */
 type UserAnswers = {
-  [key: number]: number;
+  [questionIndex: number]: number;
 };
 
+/**
+ * Main Quiz Application Component
+ * 
+ * Provides a complete quiz experience including:
+ * - Topic input and quiz generation
+ * - Interactive question answering
+ * - Results display with explanations
+ * - Quiz history tracking
+ * 
+ * @returns {JSX.Element} The main quiz application interface
+ */
 export default function Home() {
   // === State Management ===
   // The topic for the quiz entered by the user.
@@ -48,8 +70,14 @@ export default function Home() {
   const [showResults, setShowResults] = useState(false);
 
   /**
-   * Handles the initial generation of the quiz.
-   * This function is called when the "Generate Quiz" button is clicked.
+   * Generates a new quiz for the specified topic
+   * 
+   * Validates input, calls the backend API, and handles both success and error cases.
+   * Falls back to mock data if the API fails.
+   * 
+   * @async
+   * @function handleGenerateQuiz
+   * @returns {Promise<void>}
    */
   const handleGenerateQuiz = async () => {
     // Basic validation to ensure a topic is entered.
@@ -95,7 +123,14 @@ export default function Home() {
   };
 
   /**
-   * Fetches 5 more questions from the backend and appends them to the current quiz.
+   * Loads additional questions for the current topic
+   * 
+   * Fetches 5 more questions from the backend API and appends them to the existing quiz.
+   * Maintains the same topic and handles errors gracefully.
+   * 
+   * @async
+   * @function handleLoadMore
+   * @returns {Promise<void>}
    */
   const handleLoadMore = async () => {
     setLoadingMore(true);
@@ -128,9 +163,15 @@ export default function Home() {
   };
 
   /**
-   * Records the user's selected answer for a specific question.
-   * @param questionIndex The index of the question being answered.
-   * @param optionIndex The index of the option selected by the user.
+   * Records the user's answer selection for a question
+   * 
+   * Updates the userAnswers state with the selected option for the given question.
+   * Allows users to change their answers before submitting.
+   * 
+   * @function handleAnswerSelect
+   * @param {number} questionIndex - Zero-based index of the question (0-4)
+   * @param {number} optionIndex - Zero-based index of the selected option (0-3)
+   * @returns {void}
    */
   const handleAnswerSelect = (questionIndex: number, optionIndex: number) => {
     setUserAnswers({
@@ -142,24 +183,40 @@ export default function Home() {
   /**
    * Calculates the user's score and transitions the UI to the results view.
    */
+  /**
+   * Calculates the final score and saves the quiz result
+   * 
+   * Compares user answers with correct answers, calculates the score,
+   * transitions to results view, and saves the result to the backend.
+   * 
+   * @async
+   * @function handleSubmitQuiz
+   * @returns {Promise<void>}
+   */
   const handleSubmitQuiz = async () => {
     if (!quiz) return;
+    
     let correctAnswers = 0;
-    // Loop through the quiz questions and compare user's answers with correct answers.
+    // Calculate score by comparing user answers with correct answers
     quiz.forEach((question, index) => {
       if (userAnswers[index] === question.correctOptionIndex) {
         correctAnswers++;
       }
     });
-    setScore(correctAnswers);
-    setQuizFinished(true); // Set quiz as finished to show the results screen.
     
-    // Save quiz result
+    setScore(correctAnswers);
+    setQuizFinished(true);
+    
+    // Persist quiz result to backend
     try {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/results`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, score: correctAnswers, totalQuestions: quiz.length })
+        body: JSON.stringify({ 
+          topic, 
+          score: correctAnswers, 
+          totalQuestions: quiz.length 
+        })
       });
     } catch (error) {
       console.error('Failed to save quiz result:', error);
@@ -169,12 +226,22 @@ export default function Home() {
   /**
    * Resets the entire application state to allow the user to start a new quiz.
    */
+  /**
+   * Loads and displays the quiz results history
+   * 
+   * Fetches the user's quiz history from the backend and displays it in a modal.
+   * Shows the last 10 quiz attempts with scores and dates.
+   * 
+   * @async
+   * @function loadQuizResults
+   * @returns {Promise<void>}
+   */
   const loadQuizResults = async () => {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/results`);
       if (response.ok) {
-        const results = await response.json();
-        setQuizResults(results);
+        const data = await response.json();
+        setQuizResults(data.results || data); // Handle both paginated and simple responses
         setShowResults(true);
       }
     } catch (error) {
@@ -182,6 +249,15 @@ export default function Home() {
     }
   };
 
+  /**
+   * Resets the application to its initial state
+   * 
+   * Clears all quiz data, user answers, and UI state to allow starting a new quiz.
+   * Returns the user to the topic input screen.
+   * 
+   * @function handleRestart
+   * @returns {void}
+   */
   const handleRestart = () => {
     setTopic('');
     setQuiz(null);
