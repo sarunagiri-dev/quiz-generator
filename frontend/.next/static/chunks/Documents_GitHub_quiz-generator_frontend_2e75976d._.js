@@ -6,6 +6,7 @@ __turbopack_context__.s([
     "default",
     ()=>Home
 ]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = /*#__PURE__*/ __turbopack_context__.i("[project]/Documents/GitHub/quiz-generator/frontend/node_modules/next/dist/build/polyfills/process.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Documents/GitHub/quiz-generator/frontend/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/Documents/GitHub/quiz-generator/frontend/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
@@ -53,7 +54,7 @@ function Home() {
         setScore(null);
         try {
             // Fetch the quiz from the backend API.
-            const response = await fetch('http://localhost:3001/api/quiz', {
+            const response = await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', "/api/quiz"), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -85,7 +86,7 @@ function Home() {
         setLoadingMore(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:3001/api/quiz', {
+            const response = await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', "/api/quiz"), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -138,7 +139,7 @@ function Home() {
         setQuizFinished(true); // Set quiz as finished to show the results screen.
         // Save quiz result
         try {
-            await fetch('http://localhost:3001/api/results', {
+            await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', "/api/results"), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -157,7 +158,7 @@ function Home() {
    * Resets the entire application state to allow the user to start a new quiz.
    */ const loadQuizResults = async ()=>{
         try {
-            const response = await fetch('http://localhost:3001/api/results');
+            const response = await fetch("".concat(__TURBOPACK__imported__module__$5b$project$5d2f$Documents$2f$GitHub$2f$quiz$2d$generator$2f$frontend$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:3001', "/api/results"));
             if (response.ok) {
                 const results = await response.json();
                 setQuizResults(results);

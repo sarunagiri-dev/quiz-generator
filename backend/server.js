@@ -2,8 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const OpenAI = require('openai');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 require('dotenv').config(); // Loads environment variables from a .env file
 
 // Create an Express application
@@ -21,8 +20,20 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// === Storage Setup ===
-const QUIZ_RESULTS_FILE = path.join(__dirname, 'quiz_results.json');
+// === MongoDB Setup ===
+mongoose.connect(process.env.MONGODB_URI || '***REMOVED***localhost:27017/quiz-generator')
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
+
+// Quiz Result Schema
+const QuizResultSchema = new mongoose.Schema({
+  topic: { type: String, required: true },
+  score: { type: Number, required: true },
+  totalQuestions: { type: Number, required: true },
+  timestamp: { type: Date, default: Date.now }
+});
+
+const QuizResult = mongoose.model('QuizResult', QuizResultSchema);
 
 // Wikipedia retrieval function
 const getWikipediaContext = async (topic) => {
@@ -38,17 +49,15 @@ const getWikipediaContext = async (topic) => {
   return '';
 };
 
-// Save quiz results
-const saveQuizResult = (topic, score, totalQuestions, timestamp) => {
+// Save quiz results to MongoDB
+const saveQuizResult = async (topic, score, totalQuestions) => {
   try {
-    let results = [];
-    if (fs.existsSync(QUIZ_RESULTS_FILE)) {
-      results = JSON.parse(fs.readFileSync(QUIZ_RESULTS_FILE, 'utf8'));
-    }
-    results.push({ topic, score, totalQuestions, timestamp });
-    fs.writeFileSync(QUIZ_RESULTS_FILE, JSON.stringify(results, null, 2));
+    const result = new QuizResult({ topic, score, totalQuestions });
+    await result.save();
+    return result;
   } catch (error) {
     console.error('Failed to save quiz result:', error.message);
+    throw error;
   }
 };
 
@@ -137,25 +146,26 @@ Generate a 5-question multiple-choice quiz. Return only JSON array with this str
 });
 
 // Get quiz results endpoint
-app.get('/api/results', (req, res) => {
+app.get('/api/results', async (req, res) => {
   try {
-    if (fs.existsSync(QUIZ_RESULTS_FILE)) {
-      const results = JSON.parse(fs.readFileSync(QUIZ_RESULTS_FILE, 'utf8'));
-      res.json(results);
-    } else {
-      res.json([]);
-    }
+    const results = await QuizResult.find().sort({ timestamp: -1 }).limit(50);
+    res.json(results);
   } catch (error) {
+    console.error('Failed to load results:', error);
     res.status(500).json({ error: 'Failed to load results' });
   }
 });
 
 // Save quiz result endpoint
-app.post('/api/results', (req, res) => {
-  const { topic, score, totalQuestions } = req.body;
-  const timestamp = new Date().toISOString();
-  saveQuizResult(topic, score, totalQuestions, timestamp);
-  res.json({ success: true });
+app.post('/api/results', async (req, res) => {
+  try {
+    const { topic, score, totalQuestions } = req.body;
+    const result = await saveQuizResult(topic, score, totalQuestions);
+    res.json({ success: true, result });
+  } catch (error) {
+    console.error('Failed to save result:', error);
+    res.status(500).json({ error: 'Failed to save result' });
+  }
 });
 
 // === Server Initialization ===

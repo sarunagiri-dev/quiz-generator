@@ -43,9 +43,9 @@ A full-stack web application that generates intelligent, contextually-aware quiz
          │                       ▼
          │              ┌─────────────────┐
          │              │                 │
-         └──────────────┤  Local Storage  │
-                        │                 │
-                        │ quiz_results.json│
+         └──────────────┤   MongoDB       │
+                        │   Database      │
+                        │ (quiz_results)  │
                         └─────────────────┘
 
 Data Flow:
@@ -54,8 +54,8 @@ Data Flow:
 3. Backend → Wikipedia API (context)
 4. Backend → OpenAI API (quiz generation)
 5. Generated quiz → Frontend
-6. User completes quiz → Results saved locally
-7. Results history available via /api/results
+6. User completes quiz → Results saved to MongoDB
+7. Results history retrieved from MongoDB via /api/results
 ```
 
 ## 🛠️ Tech Stack
@@ -70,7 +70,8 @@ Data Flow:
 - Node.js (Runtime)
 - Express.js (Web Framework)
 - OpenAI SDK (AI Integration)
-- File System (Local Storage)
+- MongoDB (Database)
+- Mongoose (ODM)
 
 **External Services**
 - OpenAI GPT-3.5-turbo (Quiz Generation)
@@ -102,12 +103,31 @@ cd ../frontend && npm install
 ```
 
 ### 2. Environment Setup
-Create `backend/.env`:
-```env
-OPENAI_API_KEY=your_openai_api_key_here
+Copy the example file and add your credentials:
+```bash
+cp backend/.env.example backend/.env
+# Edit backend/.env with your actual API keys
 ```
 
-### 3. Start the Application
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+MONGODB_URI=***REMOVED***localhost:27017/quiz-generator
+```
+
+**⚠️ SECURITY: Never commit `.env` files to version control!**
+
+### 3. Database Setup
+```bash
+# Install MongoDB locally or use MongoDB Atlas
+# For local installation:
+brew install mongodb/brew/mongodb-community  # macOS
+# or follow MongoDB installation guide for your OS
+
+# Start MongoDB (if local)
+mongod
+```
+
+### 4. Start the Application
 ```bash
 # Terminal 1: Start Backend
 cd backend
@@ -182,10 +202,11 @@ npm test
 - Temperature: `0.7` (balanced creativity/consistency)
 - Context: Wikipedia integration for factual accuracy
 
-### Storage
-- Quiz results: `backend/quiz_results.json`
-- Format: JSON array with timestamps
-- Automatic backup on each save
+### Database
+- MongoDB database: `quiz-generator`
+- Collection: `quizresults`
+- Schema: topic, score, totalQuestions, timestamp
+- Automatic indexing and querying
 
 ## 🚀 Deployment
 
@@ -209,9 +230,11 @@ npm start
 NODE_ENV=production
 PORT=3001
 OPENAI_API_KEY=your_production_key
+MONGODB_URI=your_mongodb_connection_string
 
 # Development
 NODE_ENV=development
+MONGODB_URI=***REMOVED***localhost:27017/quiz-generator
 ```
 
 ## 🤝 Contributing
@@ -229,10 +252,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🔮 Future Enhancements
 
 - [ ] User authentication and profiles
-- [ ] Database integration (PostgreSQL/MongoDB)
+- [x] Database integration (MongoDB)
 - [ ] Real-time multiplayer quizzes
 - [ ] Advanced analytics dashboard
 - [ ] Mobile app (React Native)
 - [ ] Quiz sharing and collaboration
 - [ ] Custom difficulty levels
 - [ ] Image and video question support
+- [ ] Quiz categories and tagging
+- [ ] Performance analytics and insights

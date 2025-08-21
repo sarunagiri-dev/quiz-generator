@@ -57,7 +57,7 @@ function Home() {
         setScore(null);
         try {
             // Fetch the quiz from the backend API.
-            const response = await fetch('http://localhost:3001/api/quiz', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/quiz`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -89,7 +89,7 @@ function Home() {
         setLoadingMore(true);
         setError(null);
         try {
-            const response = await fetch('http://localhost:3001/api/quiz', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/quiz`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -142,7 +142,7 @@ function Home() {
         setQuizFinished(true); // Set quiz as finished to show the results screen.
         // Save quiz result
         try {
-            await fetch('http://localhost:3001/api/results', {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/results`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -161,7 +161,7 @@ function Home() {
    * Resets the entire application state to allow the user to start a new quiz.
    */ const loadQuizResults = async ()=>{
         try {
-            const response = await fetch('http://localhost:3001/api/results');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/results`);
             if (response.ok) {
                 const results = await response.json();
                 setQuizResults(results);
