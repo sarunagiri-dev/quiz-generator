@@ -1,37 +1,21 @@
 {
   "pages": {
     "/_not-found/page": [
-      "static/chunks/1b9b3_next_dist_c1c0a7bb._.js",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_src_app_favicon_ico_mjs_169ce420._.js",
-      "static/chunks/[root-of-the-server]__6055a6bd._.css",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_src_app_layout_tsx_630cac20._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_6a89c5ca._.js",
-      "static/chunks/1b9b3_next_dist_compiled_react-dom_4bbd15fd._.js",
-      "static/chunks/1b9b3_next_dist_compiled_next-devtools_index_d5ab4c8d.js",
-      "static/chunks/1b9b3_next_dist_compiled_f553b290._.js",
-      "static/chunks/1b9b3_next_dist_client_c957df06._.js",
-      "static/chunks/1b9b3_next_dist_87498917._.js",
-      "static/chunks/1b9b3_@swc_helpers_cjs_35668c4f._.js",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_a0ff3932._.js",
-      "static/chunks/turbopack-Documents_GitHub_quiz-generator_frontend_b69e968f._.js"
+      "static/chunks/060f9a97930f3d04.js",
+      "static/chunks/5136ac1cf526f534.css",
+      "static/chunks/fd2be76e6b40ca47.js",
+      "static/chunks/31bc4565ab341ca3.js",
+      "static/chunks/569f8ca39997ccda.js",
+      "static/chunks/turbopack-0d639602b228b424.js"
     ],
     "/page": [
-      "static/chunks/1b9b3_next_dist_c1c0a7bb._.js",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_src_app_favicon_ico_mjs_169ce420._.js",
-      "static/chunks/[root-of-the-server]__6055a6bd._.css",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_src_app_layout_tsx_630cac20._.js",
-      "static/chunks/1b9b3_next_dist_client_components_builtin_global-error_baa14eb2.js",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_2e75976d._.js",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_src_app_page_tsx_baa14eb2._.js",
-      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_6a89c5ca._.js",
-      "static/chunks/1b9b3_next_dist_compiled_react-dom_4bbd15fd._.js",
-      "static/chunks/1b9b3_next_dist_compiled_next-devtools_index_d5ab4c8d.js",
-      "static/chunks/1b9b3_next_dist_compiled_f553b290._.js",
-      "static/chunks/1b9b3_next_dist_client_c957df06._.js",
-      "static/chunks/1b9b3_next_dist_87498917._.js",
-      "static/chunks/1b9b3_@swc_helpers_cjs_35668c4f._.js",
-      "static/chunks/Documents_GitHub_quiz-generator_frontend_a0ff3932._.js",
-      "static/chunks/turbopack-Documents_GitHub_quiz-generator_frontend_b69e968f._.js"
+      "static/chunks/060f9a97930f3d04.js",
+      "static/chunks/5136ac1cf526f534.css",
+      "static/chunks/a3068cb6dab003a5.js",
+      "static/chunks/fd2be76e6b40ca47.js",
+      "static/chunks/31bc4565ab341ca3.js",
+      "static/chunks/569f8ca39997ccda.js",
+      "static/chunks/turbopack-0d639602b228b424.js"
     ]
   }
 }

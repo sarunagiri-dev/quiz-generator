@@ -1,23 +1,27 @@
 globalThis.__BUILD_MANIFEST = {
   "pages": {
-    "/_app": []
+    "/_app": [
+      "static/chunks/e60ef129113f6e24.js",
+      "static/chunks/ea160139848c787d.js",
+      "static/chunks/turbopack-ab4d597ae3c382e2.js"
+    ],
+    "/_error": [
+      "static/chunks/17722e3ac4e00587.js",
+      "static/chunks/ea160139848c787d.js",
+      "static/chunks/turbopack-002ca5c8ba634d5f.js"
+    ]
   },
   "devFiles": [],
   "ampDevFiles": [],
   "polyfillFiles": [
-    "static/chunks/1b9b3_next_dist_build_polyfills_polyfill-nomodule.js"
+    "static/chunks/a6dad97d9634a72d.js"
   ],
   "lowPriorityFiles": [],
   "rootMainFiles": [
-    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_6a89c5ca._.js",
-    "static/chunks/1b9b3_next_dist_compiled_react-dom_4bbd15fd._.js",
-    "static/chunks/1b9b3_next_dist_compiled_next-devtools_index_d5ab4c8d.js",
-    "static/chunks/1b9b3_next_dist_compiled_f553b290._.js",
-    "static/chunks/1b9b3_next_dist_client_c957df06._.js",
-    "static/chunks/1b9b3_next_dist_87498917._.js",
-    "static/chunks/1b9b3_@swc_helpers_cjs_35668c4f._.js",
-    "static/chunks/Documents_GitHub_quiz-generator_frontend_a0ff3932._.js",
-    "static/chunks/turbopack-Documents_GitHub_quiz-generator_frontend_b69e968f._.js"
+    "static/chunks/fd2be76e6b40ca47.js",
+    "static/chunks/31bc4565ab341ca3.js",
+    "static/chunks/569f8ca39997ccda.js",
+    "static/chunks/turbopack-0d639602b228b424.js"
   ],
   "ampFirstPages": []
 };

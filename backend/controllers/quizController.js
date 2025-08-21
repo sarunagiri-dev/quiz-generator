@@ -7,6 +7,11 @@ const OpenAI = require('openai');
 const { getWikipediaContext } = require('../services/wikipediaService');
 const { generateMockQuiz } = require('../services/quizService');
 
+// Validate API key exists
+if (!process.env.OPENAI_API_KEY) {
+  console.error('⚠️  OpenAI API key not configured. Quiz generation will use fallback.');
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -20,14 +25,14 @@ const generateQuiz = async (req, res) => {
   try {
     const { topic } = req.body;
 
-    // Validate input
+    // Input validation and sanitization
     if (!topic || typeof topic !== 'string' || topic.trim().length === 0) {
       return res.status(400).json({ 
         error: 'Topic is required and must be a non-empty string' 
       });
     }
 
-    const trimmedTopic = topic.trim();
+    const trimmedTopic = topic.trim().substring(0, 50); // Limit to 50 chars for security
 
     // Get Wikipedia context for factual accuracy
     const context = await getWikipediaContext(trimmedTopic);
