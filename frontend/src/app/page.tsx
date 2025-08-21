@@ -20,6 +20,7 @@ export default function Home() {
   const [userAnswers, setUserAnswers] = useState<UserAnswers>({});
   const [score, setScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [quizFinished, setQuizFinished] = useState(false);
 
@@ -58,6 +59,35 @@ export default function Home() {
       setError(err.message || 'An unknown error occurred.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    setError(null);
+    try {
+      const response = await fetch('http://localhost:5000/api/quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ topic }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to generate more questions');
+      }
+
+      const newQuestions: Question[] = await response.json();
+      if (!Array.isArray(newQuestions) || newQuestions.length === 0) {
+        throw new Error("The AI returned invalid quiz data. Please try again.");
+      }
+      setQuiz(prevQuiz => prevQuiz ? [...prevQuiz, ...newQuestions] : newQuestions);
+    } catch (err: any) {
+      setError(err.message || 'An unknown error occurred while loading more questions.');
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -143,12 +173,22 @@ export default function Home() {
                 </div>
               </div>
             ))}
-            <button
-              onClick={handleSubmitQuiz}
-              className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              Submit Quiz
-            </button>
+            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <button
+                onClick={handleSubmitQuiz}
+                className="w-full sm:w-1/2 bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Submit Quiz
+              </button>
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="w-full sm:w-1/2 bg-gray-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-600 disabled:bg-gray-400 dark:disabled:bg-gray-700 transition-colors"
+              >
+                {loadingMore ? 'Loading...' : 'Load More Questions'}
+              </button>
+            </div>
+            {error && <p className="text-red-500 mt-4 text-center">{error}</p>}
           </div>
         )}
 
@@ -174,7 +214,7 @@ export default function Home() {
                       return <p key={oIndex} style={style}>{option}</p>;
                     })}
                   </div>
-                  {!isCorrect && <p className="text-sm mt-1">Your answer: <span style={{color: 'red'}}>{q.options[userAnswer]}</span></p>}
+                  {!isCorrect && userAnswer !== undefined && <p className="text-sm mt-1">Your answer: <span style={{color: 'red'}}>{q.options[userAnswer]}</span></p>}
                   <p className="text-sm mt-1">Correct answer: <span style={{color: 'green'}}>{q.options[q.correctOptionIndex]}</span></p>
                 </div>
               );
