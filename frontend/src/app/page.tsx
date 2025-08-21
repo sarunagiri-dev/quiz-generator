@@ -8,6 +8,14 @@ type Question = {
   question: string;
   options: string[];
   correctOptionIndex: number;
+  explanation?: string;
+};
+
+type QuizResult = {
+  topic: string;
+  score: number;
+  totalQuestions: number;
+  timestamp: string;
 };
 
 // Defines the structure for storing the user's answers.
@@ -34,6 +42,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   // A boolean to indicate if the quiz has been submitted and the results are being shown.
   const [quizFinished, setQuizFinished] = useState(false);
+  // Array to store quiz results history
+  const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
+  // Boolean to show/hide results history
+  const [showResults, setShowResults] = useState(false);
 
   /**
    * Handles the initial generation of the quiz.
@@ -55,7 +67,7 @@ export default function Home() {
 
     try {
       // Fetch the quiz from the backend API.
-      const response = await fetch('http://localhost:5000/api/quiz', {
+      const response = await fetch('http://localhost:3001/api/quiz', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,7 +101,7 @@ export default function Home() {
     setLoadingMore(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:5000/api/quiz', {
+      const response = await fetch('http://localhost:3001/api/quiz', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -130,7 +142,7 @@ export default function Home() {
   /**
    * Calculates the user's score and transitions the UI to the results view.
    */
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     if (!quiz) return;
     let correctAnswers = 0;
     // Loop through the quiz questions and compare user's answers with correct answers.
@@ -141,11 +153,35 @@ export default function Home() {
     });
     setScore(correctAnswers);
     setQuizFinished(true); // Set quiz as finished to show the results screen.
+    
+    // Save quiz result
+    try {
+      await fetch('http://localhost:3001/api/results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, score: correctAnswers, totalQuestions: quiz.length })
+      });
+    } catch (error) {
+      console.error('Failed to save quiz result:', error);
+    }
   };
 
   /**
    * Resets the entire application state to allow the user to start a new quiz.
    */
+  const loadQuizResults = async () => {
+    try {
+      const response = await fetch('http://localhost:3001/api/results');
+      if (response.ok) {
+        const results = await response.json();
+        setQuizResults(results);
+        setShowResults(true);
+      }
+    } catch (error) {
+      console.error('Failed to load quiz results:', error);
+    }
+  };
+
   const handleRestart = () => {
     setTopic('');
     setQuiz(null);
@@ -153,6 +189,7 @@ export default function Home() {
     setScore(null);
     setError(null);
     setQuizFinished(false);
+    setShowResults(false);
   };
 
   // === JSX Rendering ===
@@ -261,15 +298,55 @@ export default function Home() {
                   {/* Show the user's incorrect answer explicitly if they got it wrong */}
                   {!isCorrect && userAnswer !== undefined && <p className="text-sm mt-1">Your answer: <span style={{color: 'red'}}>{q.options[userAnswer]}</span></p>}
                   <p className="text-sm mt-1">Correct answer: <span style={{color: 'green'}}>{q.options[q.correctOptionIndex]}</span></p>
+                  {q.explanation && <p className="text-sm mt-2 p-2 bg-blue-50 dark:bg-blue-900 rounded"><strong>Explanation:</strong> {q.explanation}</p>}
                 </div>
               );
             })}
 
+            <div className="flex flex-col sm:flex-row gap-4 mt-6">
+              <button
+                onClick={handleRestart}
+                className="w-full sm:w-1/2 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Take Another Quiz
+              </button>
+              <button
+                onClick={loadQuizResults}
+                className="w-full sm:w-1/2 bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                View Results History
+              </button>
+            </div>
+          </div>
+        )}
+
+        {showResults && (
+          <div className="mt-6">
+            <h2 className="text-2xl font-semibold mb-4 text-center">Quiz Results History</h2>
+            {quizResults.length === 0 ? (
+              <p className="text-center">No quiz results yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {quizResults.slice(-10).reverse().map((result, index) => (
+                  <div key={index} className="p-3 border rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold">{result.topic}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {new Date(result.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="text-sm">
+                      Score: {result.score}/{result.totalQuestions} ({Math.round((result.score/result.totalQuestions)*100)}%)
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
             <button
-              onClick={handleRestart}
-              className="w-full mt-6 bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              onClick={() => setShowResults(false)}
+              className="w-full mt-4 bg-gray-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors"
             >
-              Take Another Quiz
+              Close History
             </button>
           </div>
         )}

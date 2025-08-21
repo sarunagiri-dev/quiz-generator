@@ -1,0 +1,28 @@
+globalThis.__BUILD_MANIFEST = {
+  "pages": {
+    "/_app": []
+  },
+  "devFiles": [],
+  "ampDevFiles": [],
+  "polyfillFiles": [
+    "static/chunks/1b9b3_next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_6a89c5ca._.js",
+    "static/chunks/1b9b3_next_dist_compiled_react-dom_4bbd15fd._.js",
+    "static/chunks/1b9b3_next_dist_compiled_next-devtools_index_d5ab4c8d.js",
+    "static/chunks/1b9b3_next_dist_compiled_f553b290._.js",
+    "static/chunks/1b9b3_next_dist_client_c957df06._.js",
+    "static/chunks/1b9b3_next_dist_87498917._.js",
+    "static/chunks/1b9b3_@swc_helpers_cjs_35668c4f._.js",
+    "static/chunks/Documents_GitHub_quiz-generator_frontend_a0ff3932._.js",
+    "static/chunks/turbopack-Documents_GitHub_quiz-generator_frontend_b69e968f._.js"
+  ],
+  "ampFirstPages": []
+};
+globalThis.__BUILD_MANIFEST.lowPriorityFiles = [
+"/static/" + process.env.__NEXT_BUILD_ID + "/_buildManifest.js",
+,"/static/" + process.env.__NEXT_BUILD_ID + "/_ssgManifest.js",
+
+];

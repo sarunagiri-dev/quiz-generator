@@ -1,123 +1,238 @@
-# AI Quiz Generator MVP
+# AI Quiz Generator
 
-This project is a full-stack web application that serves as a Minimum Viable Product (MVP) for an AI-powered quiz generator. Users can provide a topic, and the application uses an AI model to generate a 5-question multiple-choice quiz.
+A full-stack web application that generates intelligent, contextually-aware quizzes using AI. Built with modern technologies and enhanced with Wikipedia integration for factual accuracy.
 
-## Features
+## 🚀 Features
 
--   **Dynamic Quiz Generation:** Generates quizzes on any topic using an AI model (GPT-3.5-Turbo).
--   **Interactive UI:** Users can take the quiz and receive immediate feedback on their score.
--   **Clear Feedback:** Shows correct and incorrect answers after submission.
--   **Robust Backend:** Built with Node.js and Express, with error handling.
--   **Modern Frontend:** Built with Next.js, React, and TypeScript for a type-safe and responsive user experience.
--   **Unit Tested:** The backend API includes a suite of unit tests using Jest and Supertest.
+### Core Functionality
+- **AI-Powered Quiz Generation**: Uses OpenAI GPT-3.5-turbo to create dynamic quizzes on any topic
+- **Wikipedia Integration**: Fetches contextual information to improve quiz accuracy and relevance
+- **Interactive User Interface**: Modern, responsive design with real-time feedback
+- **Smart Fallback System**: Gracefully handles API failures with topic-specific mock quizzes
 
-## Architecture
+### Learning Enhancement
+- **Answer Explanations**: Detailed explanations for each correct answer to enhance learning
+- **Immediate Feedback**: Shows correct/incorrect answers with visual indicators
+- **Progress Tracking**: Persistent quiz history with scores and timestamps
+- **Results Analytics**: View performance trends and learning progress over time
 
-The application follows a classic client-server architecture.
+### Technical Excellence
+- **Type-Safe Frontend**: Built with Next.js, React, and TypeScript
+- **Robust Backend**: Node.js/Express with comprehensive error handling
+- **RESTful API**: Clean, documented endpoints for all functionality
+- **Unit Testing**: Complete test suite using Jest and Supertest
+- **Local Storage**: File-based persistence for quiz results
+
+## 🏗️ Architecture
 
 ```
-+-----------------+      +----------------------+      +--------------------+
-|                 |      |                      |      |                    |
-|  User's Browser |----->|   Frontend Server    |----->|   Backend Server   |
-| (React/Next.js) |      | (Next.js on Port 3000) |      | (Express on Port 5000) |
-|                 |      |                      |      |                    |
-+-----------------+      +----------------------+      +----------+---------+
-       ^                                                            |
-       |                                                            | HTTP API Request
-       |  (HTML/CSS/JS)                                             | (e.g., /api/quiz)
-       |                                                            |
-       +------------------------------------------------------------+
-                                                                    |
-                                                                    v
-                                                          +--------------------+
-                                                          |    OpenAI API      |
-                                                          | (gpt-3.5-turbo)    |
-                                                          +--------------------+
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│                 │    │                  │    │                 │
+│  Frontend       │◄──►│  Backend Server  │◄──►│  External APIs  │
+│  (Next.js)      │    │  (Express.js)    │    │                 │
+│  Port: 3000     │    │  Port: 3001      │    │                 │
+│                 │    │                  │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       ├─ OpenAI API
+         │                       │                       │  (GPT-3.5-turbo)
+         │                       │                       │
+         │                       │                       └─ Wikipedia API
+         │                       │                          (Context Retrieval)
+         │                       │
+         │                       ▼
+         │              ┌─────────────────┐
+         │              │                 │
+         └──────────────┤  Local Storage  │
+                        │                 │
+                        │ quiz_results.json│
+                        └─────────────────┘
+
+Data Flow:
+1. User enters topic → Frontend
+2. Frontend → Backend (/api/quiz)
+3. Backend → Wikipedia API (context)
+4. Backend → OpenAI API (quiz generation)
+5. Generated quiz → Frontend
+6. User completes quiz → Results saved locally
+7. Results history available via /api/results
 ```
 
-1.  The **User** interacts with the frontend application in their browser.
-2.  The **Frontend** (Next.js/React) sends an HTTP POST request with the desired topic to the backend.
-3.  The **Backend** (Node.js/Express) receives the request, constructs a prompt, and sends it to the **OpenAI API**.
-4.  The **OpenAI API** returns the generated quiz data as a JSON object.
-5.  The **Backend** forwards this JSON data to the frontend.
-6.  The **Frontend** displays the quiz to the user.
+## 🛠️ Tech Stack
 
-## Tech Stack
+**Frontend**
+- Next.js 14 (React Framework)
+- TypeScript (Type Safety)
+- Tailwind CSS (Styling)
+- Fetch API (HTTP Client)
 
--   **Backend:** Node.js, Express.js
--   **Frontend:** Next.js, React, TypeScript, Tailwind CSS
--   **AI:** OpenAI API (gpt-3.5-turbo)
--   **Testing:** Jest, Supertest
+**Backend**
+- Node.js (Runtime)
+- Express.js (Web Framework)
+- OpenAI SDK (AI Integration)
+- File System (Local Storage)
 
-## Prerequisites
+**External Services**
+- OpenAI GPT-3.5-turbo (Quiz Generation)
+- Wikipedia REST API (Context Retrieval)
 
--   Node.js (v18 or later recommended)
--   npm (or yarn/pnpm)
--   An OpenAI API Key
+**Development & Testing**
+- Jest (Testing Framework)
+- Supertest (API Testing)
+- ESLint (Code Quality)
 
-## Setup and Installation
+## 📋 Prerequisites
 
-### 1. Environment Variables
+- Node.js (v18 or later)
+- npm or yarn
+- OpenAI API Key ([Get one here](https://platform.openai.com/account/api-keys))
 
-The backend server requires an API key from OpenAI to function.
+## ⚡ Quick Start
 
-1.  **Obtain an API Key:**
-    -   Go to the [OpenAI Platform website](https://platform.openai.com/).
-    -   Sign up or log in to your account.
-    -   Navigate to the "API keys" section in your account settings.
-    -   Create a new secret key and copy it.
+### 1. Clone & Install
+```bash
+git clone <repository-url>
+cd quiz-generator
 
-2.  **Configure the Backend:**
-    -   In the `backend` directory, create a new file named `.env`.
-    -   Add the following line to the `.env` file, replacing `YOUR_API_KEY_HERE` with the key you copied:
-        ```
-        OPENAI_API_KEY=YOUR_API_KEY_HERE
-        ```
-    -   The application is now configured to use your API key.
+# Install backend dependencies
+cd backend && npm install
 
-### 2. Running the Application
+# Install frontend dependencies
+cd ../frontend && npm install
+```
 
-You need to run two separate processes for the backend and the frontend.
+### 2. Environment Setup
+Create `backend/.env`:
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+```
 
-**Backend Server:**
+### 3. Start the Application
+```bash
+# Terminal 1: Start Backend
+cd backend
+npm start
+# Server runs on http://localhost:3001
+
+# Terminal 2: Start Frontend
+cd frontend
+npm run dev
+# App available at http://localhost:3000
+```
+
+## 📚 API Documentation
+
+### Quiz Generation
+```http
+POST /api/quiz
+Content-Type: application/json
+
+{
+  "topic": "photosynthesis"
+}
+```
+
+**Response:**
+```json
+[
+  {
+    "question": "What is the primary purpose of photosynthesis?",
+    "options": ["Energy storage", "Oxygen production", "Water absorption", "Root growth"],
+    "correctOptionIndex": 0,
+    "explanation": "Photosynthesis converts light energy into chemical energy (glucose) for storage."
+  }
+]
+```
+
+### Results Management
+```http
+# Get quiz history
+GET /api/results
+
+# Save quiz result
+POST /api/results
+{
+  "topic": "math",
+  "score": 4,
+  "totalQuestions": 5
+}
+```
+
+## 🧪 Testing
 
 ```bash
-# Navigate to the backend directory
 cd backend
+npm test
+```
 
-# Install dependencies
-npm install
+**Test Coverage:**
+- API endpoint functionality
+- Error handling scenarios
+- Mock quiz generation
+- Results persistence
 
-# Start the server
+## 🔧 Configuration
+
+### Port Configuration
+- Backend: `PORT` environment variable (default: 3001)
+- Frontend: Next.js default (3000)
+
+### OpenAI Settings
+- Model: `gpt-3.5-turbo`
+- Temperature: `0.7` (balanced creativity/consistency)
+- Context: Wikipedia integration for factual accuracy
+
+### Storage
+- Quiz results: `backend/quiz_results.json`
+- Format: JSON array with timestamps
+- Automatic backup on each save
+
+## 🚀 Deployment
+
+### Backend Deployment
+```bash
+# Production build
+npm install --production
+NODE_ENV=production npm start
+```
+
+### Frontend Deployment
+```bash
+# Build for production
+npm run build
 npm start
 ```
 
-The backend server will start on `http://localhost:5000`.
+### Environment Variables
+```env
+# Production
+NODE_ENV=production
+PORT=3001
+OPENAI_API_KEY=your_production_key
 
-**Frontend Server:**
-
-```bash
-# Open a new terminal window
-# Navigate to the frontend directory
-cd frontend
-
-# Install dependencies
-npm install
-
-# Start the development server
-npm run dev
+# Development
+NODE_ENV=development
 ```
 
-The frontend application will be available at `http://localhost:3000`. You can now open this URL in your browser to use the app.
+## 🤝 Contributing
 
-## Running Tests
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
-The backend has a suite of unit tests. To run them:
+## 📄 License
 
-```bash
-# Navigate to the backend directory
-cd backend
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# Run the tests
-npm test
-```
+## 🔮 Future Enhancements
+
+- [ ] User authentication and profiles
+- [ ] Database integration (PostgreSQL/MongoDB)
+- [ ] Real-time multiplayer quizzes
+- [ ] Advanced analytics dashboard
+- [ ] Mobile app (React Native)
+- [ ] Quiz sharing and collaboration
+- [ ] Custom difficulty levels
+- [ ] Image and video question support
