@@ -27,8 +27,8 @@ git push origin main
 4. Click "Variables" tab
 5. Add these 3 variables:
    ```
-   OPENAI_API_KEY = ***REMOVED***kUgJfWJwveKffzyGhu5I_-U7Ya-0cgIDkhNZje1uZid7ZtyL9DPqBcP_ZE0YoARM8tRtNre3KmT3BlbkFJCrmkoMYIu5gpAV515EcxvbHeawq--AEmqvGVrSHKabaYsvzHBD9uChyCyxNBoCzx8tKOWS-jAA
-   MONGODB_URI = ***REMOVED***sujatha:Jgq48rkvr44gr8av@quiz-app.njwhsvi.mongodb.net/
+   OPENAI_API_KEY = ""
+   MONGODB_URI = ""
    FRONTEND_URL = https://quiz-generator-frontend.vercel.app
    ```
 6. Railway will redeploy automatically
