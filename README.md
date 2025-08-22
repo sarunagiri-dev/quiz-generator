@@ -14,17 +14,19 @@ A full-stack web application that generates intelligent, contextually-aware quiz
 - **Answer Explanations**: Detailed explanations for each correct answer to enhance learning
 - **Immediate Feedback**: Shows correct/incorrect answers with visual indicators
 - **Progress Tracking**: Persistent quiz history with scores and timestamps
-- **Results Analytics**: View performance trends and learning progress over time
-- **Statistics Dashboard**: Aggregate statistics and performance metrics
+- **Results History**: View past quiz attempts with scores and dates
+- **Load More Questions**: Dynamically add more questions to extend quiz length
+- **Statistics API**: Backend endpoint for aggregate statistics and performance metrics
 
 ### Technical Excellence
 - **Modular Architecture**: Clean separation of concerns with MVC pattern
 - **Type-Safe Frontend**: Built with Next.js, React, and TypeScript
 - **Robust Backend**: Node.js/Express with comprehensive error handling
 - **RESTful API**: Clean, documented endpoints with pagination and filtering
-- **Unit Testing**: Complete test suite using Jest and Supertest
+- **Unit Testing**: Essential test coverage using Jest and Supertest
 - **MongoDB Integration**: Scalable database with optimized queries and indexing
-- **Caching Layer**: Wikipedia API responses cached for performance
+- **Caching Layer**: Wikipedia API responses cached for 1 hour
+- **Rate Limiting**: 10 requests per 10 minutes per IP for cost control
 - **Production Ready**: Connection pooling, error handling, and logging
 
 ## 🏗️ Architecture
@@ -32,12 +34,13 @@ A full-stack web application that generates intelligent, contextually-aware quiz
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                           FRONTEND (Next.js)                               │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────────────┐ │
-│  │   Quiz UI       │  │  Results View   │  │    Statistics Dashboard     │ │
-│  │  - Topic Input  │  │  - History      │  │   - Performance Metrics     │ │
-│  │  - Questions    │  │  - Explanations │  │   - Topic Analytics         │ │
-│  │  - Feedback     │  │  - Pagination   │  │   - Progress Tracking       │ │
-│  └─────────────────┘  └─────────────────┘  └─────────────────────────────┘ │
+│  ┌─────────────────┐  ┌─────────────────────────────────────────────────┐ │
+│  │   Quiz UI       │  │              Results View                       │ │
+│  │  - Topic Input  │  │            - Quiz History                       │ │
+│  │  - Questions    │  │            - Score Display                      │ │
+│  │  - Feedback     │  │            - Answer Explanations                │ │
+│  │  - Scoring      │  │            - Pagination                         │ │
+│  └─────────────────┘  └─────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │ HTTP/REST API
                                     ▼
@@ -89,7 +92,9 @@ Data Flow:
 5. Generated quiz with explanations → Frontend
 6. User completes quiz → Results automatically saved to MongoDB
 7. Results history retrieved via /api/results with pagination
-8. Statistics available via /api/results/stats for analytics
+8. Statistics available via /api/results/stats API endpoint (backend only)
+9. User can load additional questions dynamically during quiz
+10. Quiz results automatically saved to database after completion
 ```
 
 ## 🛠️ Tech Stack
@@ -240,12 +245,13 @@ npm test
 ```
 
 **Test Coverage:**
-- API endpoint functionality
-- Database operations
-- Error handling scenarios
-- Mock quiz generation
-- Wikipedia integration
-- Results persistence and retrieval
+- API endpoint functionality (health check, quiz generation, results, statistics)
+- Input validation (topic requirements, empty topics, missing data)
+- Error handling scenarios (404 routes, invalid requests)
+- Mock external dependencies (OpenAI, Wikipedia, MongoDB with QuizResult model)
+- Database operations (results retrieval, saving, statistics aggregation)
+- Essential functionality verification with proper mocking
+- Fast test execution without external service dependencies
 
 ## 🔒 Security
 
@@ -324,21 +330,26 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔮 Future Enhancements
 
-- [ ] User authentication and profiles
+### Completed Features ✅
 - [x] Database integration (MongoDB)
 - [x] Modular architecture implementation  
 - [x] Comprehensive error handling
 - [x] API documentation (Swagger) and testing
 - [x] Security (rate limiting, input validation)
 - [x] Caching (Wikipedia responses)
+- [x] Load more questions functionality
+- [x] Automatic result persistence
+- [x] Quiz history with pagination
+
+### Planned Features 🚀
+- [ ] User authentication and profiles
+- [ ] Statistics dashboard UI (API exists, needs frontend component)
+- [ ] Advanced analytics and reporting
+- [ ] Question difficulty levels and adaptive quizzes
 - [ ] Real-time multiplayer quizzes
-- [ ] Advanced analytics dashboard
 - [ ] Mobile app (React Native)
 - [ ] Quiz sharing and collaboration
-- [ ] Custom difficulty levels
 - [ ] Image and video question support
 - [ ] Quiz categories and tagging
-- [ ] Performance analytics and insights
-- [ ] Rate limiting and API throttling
 - [ ] Redis caching layer
 - [ ] Microservices architecture
