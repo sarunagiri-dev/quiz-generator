@@ -26,8 +26,8 @@
 3. Add these secrets:
 
 ```
-OPENAI_API_KEY=sk-proj-your-actual-key-here
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/
+OPENAI_API_KEY=<your-openai-api-key>
+MONGODB_URI=<your-mongodb-connection-string>
 FRONTEND_URL_PROD=https://your-app.vercel.app
 ```
 
@@ -36,7 +36,7 @@ FRONTEND_URL_PROD=https://your-app.vercel.app
 **Development (.env - Local Only):**
 ```env
 NODE_ENV=development
-OPENAI_API_KEY=sk-proj-dev-key
+OPENAI_API_KEY=<your-dev-api-key>
 MONGODB_URI=mongodb+srv://dev-cluster
 FRONTEND_URL=http://localhost:3000
 PORT=3001
